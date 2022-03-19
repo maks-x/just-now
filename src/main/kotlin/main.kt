@@ -1,3 +1,5 @@
+import TimeCase.*
+
 const val MINUTE = 60
 const val HOUR = 60 * MINUTE
 const val DAY = 24 * HOUR
@@ -16,36 +18,49 @@ fun main() {
 }
 
 fun printResult(secondsAgo: Int) {
+    val timeCase = caseDefine(secondsAgo)
     println()
     println("Если пользователь $userName был в сети $secondsAgo секунд назад:")
-    println("Текст:\n   $userName был(а) в сети ${agoToText(secondsAgo)}")
+    println("Текст:\n   $userName был(а) в сети ${agoToText(timeCase, secondsAgo)}")
 }
 
-fun agoToText(secondsAgo: Int): String {
+fun caseDefine(secondsAgo: Int): TimeCase {
     return when (secondsAgo) {
-        in 0..MINUTE  -> "только что"
-        in MINUTE + 1..HOUR -> {
-            val minutes = secondsAgo / MINUTE
-            "$minutes ${format(MINUTE, minutes)} назад"
-        }
-        in HOUR + 1..DAY -> {
-            val hours = secondsAgo / HOUR
-            "$hours ${format(HOUR, hours)} назад"
-        }
-        in DAY + 1..2 * DAY -> "сегодня"
-        in 2 * DAY + 1..3 * DAY -> "вчера"
-        else -> "давно"
+        in 0..MINUTE -> JUST_NOW
+        in MINUTE + 1..HOUR -> MINUTES_AGO
+        in HOUR + 1..DAY -> HOURS_AGO
+        in DAY + 1..2 * DAY -> TODAY
+        in 2 * DAY + 1..3 * DAY -> YESTERDAY
+        else -> LONG_TIME_AGO
     }
 }
 
-fun format(timeCase: Int, timeValue: Int): String {
-    return when (timeCase) {
-        MINUTE -> when {
+fun agoToText(case: TimeCase, secondsAgo: Int): String {
+    val timeValue: Int
+    return when (case) {
+        JUST_NOW -> "только что"
+        MINUTES_AGO -> {
+            timeValue = secondsAgo / MINUTE
+            "$timeValue ${format(case, timeValue)} назад"
+        }
+        HOURS_AGO -> {
+            timeValue = secondsAgo / HOUR
+            "$timeValue ${format(case, timeValue)} назад"
+        }
+        TODAY -> "сегодня"
+        YESTERDAY -> "вчера"
+        LONG_TIME_AGO -> "давно"
+    }
+}
+
+fun format(case: TimeCase, timeValue: Int): String {
+    return when (case) {
+        MINUTES_AGO -> when {
             compareTo1(timeValue) -> "минуту"
             compareWithin2and4(timeValue) -> "минуты"
             else -> "минут"
         }
-        HOUR -> when {
+        HOURS_AGO -> when {
             compareTo1(timeValue) -> "час"
             compareWithin2and4(timeValue) -> "часа"
             else -> "часов"

@@ -1,0 +1,3 @@
+enum class TimeCase {
+    JUST_NOW, MINUTES_AGO, HOURS_AGO, TODAY, YESTERDAY, LONG_TIME_AGO
+}
